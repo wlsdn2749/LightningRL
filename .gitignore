@@ -1,0 +1,10 @@
+# Logging
+
+wandb
+
+# Test
+test.ipynb
+
+# Python 
+.venv
+*.pkl
