@@ -1,5 +1,5 @@
 #### Off Policy
-- [ ] DQN **(24-03-24)**
+- [x] DQN **(24-09-24)**
 - [ ] Double DQN
 - [ ] Dueling DQN
 - [ ] Noisy DQN
@@ -8,3 +8,10 @@
 - [ ] DDPG
 - [ ] TD3
 - [ ] SAC
+
+#### TODO
+- [ ] Record a training video and show in wandb
+
+
+#### Features
+- [x] Wandb Logger
