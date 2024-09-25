@@ -2,6 +2,7 @@ from collections import deque, namedtuple
 from typing import Tuple, Deque, List
 import random
 import gymnasium as gym
+import wandb
 
 import torch
 import torch.nn as nn
@@ -17,6 +18,27 @@ from lightning.pytorch.loggers import WandbLogger
 Transition = namedtuple(
     "Transition", ["state", "action", "reward", "new_state", "done"]
 )
+
+
+class Monitor(gym.wrappers.RecordVideo):
+    def __init__(
+        self,
+        env: gym.Env,
+        video_folder: str,
+        step_trigger=None,
+        name_prefix: str = "rl-video",
+        disable_logger=True,
+    ):
+        if step_trigger is None:
+            step_trigger = lambda x: x % 2000 == 0
+        super().__init__(
+            env,
+            video_folder,
+            episode_trigger=None,
+            step_trigger=step_trigger,
+            name_prefix=name_prefix,
+            disable_logger=disable_logger,
+        )
 
 
 class MaxEpisodesCallback(Callback):
@@ -37,8 +59,14 @@ class DQNLightning(L.LightningModule):
     def __init__(self) -> None:
         super().__init__()
         self.env = gym.make(
-            "FrozenLake-v1", desc=None, map_name="8x8", is_slippery=False
+            "FrozenLake-v1",
+            desc=None,
+            map_name="8x8",
+            is_slippery=False,
+            render_mode="rgb_array",
         )
+        self.env = Monitor(self.env, video_folder="video", disable_logger=True)
+
         self.state_size = self.env.observation_space.n  # 64
         self.action_size = self.env.action_space.n  # 4
         self.state = self.env.reset()[0]
@@ -222,9 +250,8 @@ def one_hot_encode(state, state_size):
 
 
 if __name__ == "__main__":
-    wandb_logger = WandbLogger(
-        project="lightning_dqn_frozenlake", save_dir="./wandb_logs/"
-    )
+    wandb.init(monitor_gym=True, save_code=True)  # type: ignore[attr-defined]
+    wandb_logger = WandbLogger(project="lightning_dqn_frozenlake", save_dir="./wandb/")
     model = DQNLightning()
 
     trainer = Trainer(

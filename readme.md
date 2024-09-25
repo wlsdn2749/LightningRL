@@ -10,8 +10,9 @@
 - [ ] SAC
 
 #### TODO
-- [ ] Record a training video and show in wandb
+- [ ] Implement Double DQN
 
 
 #### Features
 - [x] Wandb Logger
+- [x] Record a training video and show in wandb **(24-09-25)**

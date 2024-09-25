@@ -12,4 +12,5 @@ test.ipynb
 *.pkl
 
 # Static
+video
 *.png
