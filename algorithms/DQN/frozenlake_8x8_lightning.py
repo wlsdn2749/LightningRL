@@ -157,8 +157,8 @@ class DQNLightning(L.LightningModule):
         optimizer = optim.Adam(self.net.parameters(), lr=1e-3)
         return optimizer
 
-    def get_device(self, batch) -> str:
-        return str(batch[0].device.index) if self.on_gpu else "cpu"
+    def get_device(self, batch):
+        return batch[0].device.index if self.on_gpu else "cpu"
 
 
 class ReplayBuffer(Dataset):
@@ -222,14 +222,16 @@ def one_hot_encode(state, state_size):
 
 
 if __name__ == "__main__":
-    wandb_logger = WandbLogger(project="lightning_dqn_frozenlake")
+    wandb_logger = WandbLogger(
+        project="lightning_dqn_frozenlake", save_dir="./wandb_logs/"
+    )
     model = DQNLightning()
 
     trainer = Trainer(
         accelerator="auto",
         devices=1 if torch.cuda.is_available() else "auto",
         max_epochs=1000,
-        callbacks=[MaxEpisodesCallback()],
+        callbacks=[MaxEpisodesCallback(max_episodes=1000)],
         logger=[wandb_logger],
     )
 
