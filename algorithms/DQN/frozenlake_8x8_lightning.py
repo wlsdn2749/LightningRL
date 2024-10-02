@@ -1,19 +1,19 @@
-from collections import deque, namedtuple
-from typing import Tuple, Deque, List
 import random
-import gymnasium as gym
-import wandb
+from collections import deque, namedtuple
+from typing import Deque, List, Tuple
 
+import gymnasium as gym
+import lightning as L
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torch.utils.data import Dataset
-
-import lightning as L
 from lightning import Trainer
 from lightning.pytorch.callbacks import Callback
 from lightning.pytorch.loggers import WandbLogger
+from torch.utils.data import Dataset
+
+import wandb
 
 Transition = namedtuple(
     "Transition", ["state", "action", "reward", "new_state", "done"]
@@ -204,14 +204,10 @@ class ReplayBuffer(Dataset):
         batch = Transition(*zip(*transitions))
 
         return (
-            torch.tensor(
-                batch.state
-            ),  # 원래 FloatTensor로 state를 받았을때는 stack 이였음
+            torch.tensor(batch.state),
             torch.tensor(batch.action),
             torch.tensor(batch.reward),
-            torch.tensor(
-                batch.new_state
-            ),  # 원래 FloatTensor로 state를 받았을때는 stack 이였음
+            torch.tensor(batch.new_state),
             torch.tensor(batch.done, dtype=torch.bool),
         )
 
@@ -241,12 +237,6 @@ class DQN(nn.Module):
         x = F.relu(x)
         x = self.fc3(x)
         return x  # [bx4]
-
-
-def one_hot_encode(state, state_size):
-    encoded = torch.zeros(state_size)
-    encoded[state] = 1
-    return encoded
 
 
 if __name__ == "__main__":

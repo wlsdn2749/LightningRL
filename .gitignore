@@ -5,6 +5,7 @@ lightning_logs
 
 # Test
 test.ipynb
+test.py
 
 # Python
 .venv

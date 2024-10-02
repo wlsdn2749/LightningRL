@@ -1,3 +1,6 @@
+#### NOTICE
+<b>Register [here](https://hacktoberfest.com/) and Feel free to make PRs between October 1st-31th to grab your hypes</b>
+
 #### Off Policy
 - [x] DQN **(24-09-24)**
 - [ ] Double DQN
