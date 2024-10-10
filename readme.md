@@ -3,7 +3,7 @@
 
 #### Off Policy
 - [x] DQN **(24-09-24)**
-- [ ] Double DQN
+- [x] Double DQN **(24-10-10)**
 - [ ] Dueling DQN
 - [ ] Noisy DQN
 - [ ] DQN with Prioritized Experience Replay
@@ -12,10 +12,16 @@
 - [ ] TD3
 - [ ] SAC
 
-#### TODO
-- [ ] Implement Double DQN
+#### To-Do
+- [ ] Implement Dueling DQN
+- [ ] Change Wandb Logging naming convention -> "(Env-Algo-Number)"
+
 
 
 #### Features
 - [x] Wandb Logger
 - [x] Record a training video and show in wandb **(24-09-25)**
+
+
+#### Done
+- [X] Implement Double DQN
