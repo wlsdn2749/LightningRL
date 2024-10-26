@@ -14,7 +14,6 @@
 
 #### To-Do
 - [ ] Implement Dueling DQN
-- [ ] Change Wandb Logging naming convention -> "(Env-Algo-Number)"
 - [ ] Using Argparse to manage hyperparams
 
 
@@ -25,3 +24,4 @@
 
 #### Done
 - [X] Implement Double DQN
+- [x] Change Wandb Logging naming convention -> "(Env-Algo-Number)"

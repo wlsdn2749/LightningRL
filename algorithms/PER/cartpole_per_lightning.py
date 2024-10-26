@@ -467,9 +467,27 @@ class DQNLightning(L.LightningModule):
         return batch[0].device.index if self.on_gpu else "cpu"
 
 
+def get_project_name_counter(base_project_name) -> int:
+    api = wandb.Api()
+    user_name = api.default_entity
+    runs = api.runs(f"{user_name}/{base_project_name}")
+    run_count = len(runs)
+
+    return run_count
+
+
 if __name__ == "__main__":
-    wandb.init(monitor_gym=True, save_code=True)  # type: ignore[attr-defined]
-    wandb_logger = WandbLogger(project="lightning_ddqn_cartpole", save_dir="./wandb/")
+    env = "cartpole"
+    algo = "PER"
+    base_project_name = f"LightningRL-algorithms_{algo}"
+    version = get_project_name_counter(base_project_name)
+    wandb.init(
+        monitor_gym=True,
+        save_code=True,
+        project=base_project_name,
+        name=f"{env}-{algo}-{version}",
+    )  # type: ignore[attr-defined]
+    wandb_logger = WandbLogger(save_dir="./wandb/")
     model = DQNLightning()
 
     checkpoint_callback = ModelCheckpoint(
