@@ -1,5 +1,6 @@
 import argparse
 import os
+import random
 from collections import namedtuple
 from typing import List, Tuple
 
@@ -90,7 +91,7 @@ class SumTree:
     def __init__(self, capacity: int):
         self.capacity = capacity
         self.tree = torch.zeros(2 * capacity - 1)
-        self.data = np.empty(capacity, dtype=object)
+        self.data = np.zeros(capacity, dtype=object)  # torch.empty()
         self.write = 0  # 다음 저장 위치
         self.size = 0  # 현재 저장된 경험 수
 
@@ -174,8 +175,17 @@ class PrioritizedReplayMemory(Dataset):
         self.beta = np.min([1.0, self.beta + self.beta_increment_per_sampling])
 
         for i in range(batch_size):
-            s = torch.rand(1).item() * segment + segment * i
+            # s = min(torch.rand(1).item() * segment + segment * i, self.tree.total_priority() - self.epsilon) # 여기서 .get(s) 값이 계속 0.999를 초과하는 경우..
+            a = segment * i
+            b = segment * (i + 1)
+            s = random.uniform(a, b)
             idx, priority, data = self.tree.get(s)
+
+            # 최대 범위를 초과하지 않도록 마지막 데이터로 제한 <- 안정적인 학습을 제한할 수 있음
+            if data == 0:
+                idx = self.tree.size - 1
+                priority, data = self.tree.tree[idx].item(), self.tree.data[idx]
+
             batch.append(data)
             indices.append(idx)
             priorities.append(priority)
@@ -184,7 +194,7 @@ class PrioritizedReplayMemory(Dataset):
         total_priority = self.tree.total_priority()
 
         probabilities = priorities / total_priority
-        weights = (len(self.tree) * probabilities) ** (-self.beta)
+        weights = (self.tree.size * probabilities) ** (-self.beta)
         weights /= weights.max()  # Importance sampling
 
         batch = Transition(*zip(*batch))
@@ -230,7 +240,7 @@ class DummyDataset(Dataset):
         return 0  # Return a placeholder value
 
 
-class DQN(nn.Module):
+class DuelingDQN(nn.Module):
     """
     A Deep Neural Networks Implementation
 
@@ -246,15 +256,27 @@ class DQN(nn.Module):
         super().__init__()
         self.fc1 = nn.Linear(state_size, 256)
         self.fc2 = nn.Linear(256, 256)
-        self.fc3 = nn.Linear(256, action_size)
+
+        # Value stream this is Beta
+        # self.value_fc = nn.Linear(256, 128)
+        self.value = nn.Linear(256, 1)  # Output is scalar V(s)
+
+        # Advantage stream this is Alpha
+        # self.advantage_fc = nn.Linear(256, 128)
+        self.advantage = nn.Linear(256, action_size)  # Output is A(s, a)
 
     def forward(self, state: torch.Tensor) -> torch.tensor:
         x = self.fc1(state)
         x = F.relu(x)
         x = self.fc2(x)
         x = F.relu(x)
-        x = self.fc3(x)
-        return x
+
+        # value and advantage
+        v = self.value(x)
+        a = self.advantage(x)
+        mean_dim = 1 if a.dim() > 1 else 0
+        q = v + a - a.mean(dim=mean_dim, keepdim=True)
+        return q
 
 
 class DQNLightning(L.LightningModule):
@@ -272,8 +294,8 @@ class DQNLightning(L.LightningModule):
         )
         self.state_size = self.env.observation_space.shape[0]
         self.action_size = self.env.action_space.n
-        self.net = DQN(self.state_size, self.action_size)
-        self.target_net = DQN(self.state_size, self.action_size)
+        self.net = DuelingDQN(self.state_size, self.action_size)
+        self.target_net = DuelingDQN(self.state_size, self.action_size)
         self.replay_buffer = PrioritizedReplayMemory(self.hparams.buffer_capacity)
         self.state = self.env.reset()[0]
         self.gamma = self.hparams.gamma
@@ -299,7 +321,7 @@ class DQNLightning(L.LightningModule):
         self.avg_reward = 0
 
         # Warm Up
-        self.populate(steps=self.hparams.warm_start_steps)  # TODO
+        self.populate(steps=self.hparams.warm_start_steps)
 
     def forward(self, state) -> torch.tensor:
         return self.net(state)
@@ -480,7 +502,10 @@ def get_project_name_counter(base_project_name) -> int:
     api = wandb.Api()
     user_name = api.default_entity
     runs = api.runs(f"{user_name}/{base_project_name}")
-    run_count = len(runs)
+    try:
+        run_count = len(runs)
+    except Exception:
+        return 0
 
     return run_count
 
@@ -514,7 +539,7 @@ def add_base_args(parent_parser) -> argparse.ArgumentParser:
     arg_parser = argparse.ArgumentParser(parent_parser)
 
     arg_parser.add_argument(
-        "--algo", type=str, default="PER", help="algorithm to use for training"
+        "--algo", type=str, default="DuelingDQN", help="algorithm to use for training"
     )
     arg_parser.add_argument(
         "--batch_size", type=int, default=32, help="size of the batches"

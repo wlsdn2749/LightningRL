@@ -4,7 +4,7 @@
 #### Off Policy
 - [x] DQN **(24-09-24)**
 - [x] Double DQN **(24-10-10)**
-- [ ] Dueling DQN
+- [x] Dueling DQN **(24-10-31)**
 - [ ] Noisy DQN
 - [x] DQN with Prioritized Experience Replay **(24-10-25)**
 - [ ] N Step DQN
@@ -13,8 +13,7 @@
 - [ ] SAC
 
 #### To-Do
-- [ ] Implement Dueling DQN
-- [ ] Using Argparse to manage hyperparams
+
 
 
 #### Features
@@ -25,3 +24,5 @@
 #### Done
 - [X] Implement Double DQN
 - [x] Change Wandb Logging naming convention -> "(Env-Algo-Number)"
+- [x] Using Argparse to manage hyperparams
+- [x] Implement Dueling DQN
