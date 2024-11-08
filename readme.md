@@ -7,6 +7,8 @@
 - [x] Dueling DQN **(24-10-31)**
 - [ ] Noisy DQN
 - [x] DQN with Prioritized Experience Replay **(24-10-25)**
+- [x] C51 **(24-11-05)**
+- [ ] QR-DQN
 - [ ] N Step DQN
 - [ ] DDPG
 - [ ] TD3
@@ -26,3 +28,10 @@
 - [x] Change Wandb Logging naming convention -> "(Env-Algo-Number)"
 - [x] Using Argparse to manage hyperparams
 - [x] Implement Dueling DQN
+
+
+#### Results
+
+
+<b> Cartpole-v1 average reward</b>
+![avg_reward](results/avg_reward.png)
