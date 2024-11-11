@@ -1,6 +1,6 @@
 <table>
   <tr>
-    <td><img src="/results/dqn_cartpole.gif" width="100" height="100"></td>
+    <td><img src="/results/dqn_cartpole.gif" width="300" height="200"></td>
 </table>
 
 <div align="center">
