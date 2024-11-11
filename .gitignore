@@ -14,7 +14,6 @@ test.py
 
 # Static
 video
-*.png
 
 # vscode
 .vscode
