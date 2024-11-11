@@ -1,3 +1,7 @@
+<table>
+  <tr>
+    <td><img src="/results/dqn_cartpole.gif" width="100" height="100"></td>
+</table>
 
 <div align="center">
 
