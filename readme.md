@@ -25,7 +25,7 @@ This section lists the off-policy algorithms implemented in this project. Off-po
 - [ ] Noisy DQN
 - [x] DQN with Prioritized Experience Replay **(24-10-25)**
 - [x] C51 **(24-11-05)**
-- [ ] QR-DQN
+- [x] QR-DQN **(24-11-21)**
 - [ ] N Step DQN
 - [ ] DDPG
 - [ ] TD3
@@ -53,6 +53,9 @@ This section tracks our recent accomplishments and completed tasks, providing a 
 
 
 #### Experimental Results
+
+**You can see recent overall experimental results in [HERE](https://api.wandb.ai/links/setine/56cvey4k)!**
+
 Here we present the performance results of our implemented algorithms. These graphs and metrics help visualize the effectiveness of each method.
 
 **Cartpole-v1 average reward**
